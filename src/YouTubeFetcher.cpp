@@ -17,10 +17,19 @@ std::string YouTubeFetcher::executeCommand(const std::string& cmd) {
     while (fgets(buffer.data(), buffer.size(), pipe.get()) != nullptr) {
         result += buffer.data();
     }
-    if (!result.empty() && result.back() == '\n') {
+    while (!result.empty() && (result.back() == '\n' || result.back() == '\r')) {
         result.pop_back();
     }
     return result;
+}
+
+std::string YouTubeFetcher::getVideoTitle(const std::string& youtubeUrl) {
+    std::string cmd = "yt-dlp --no-playlist --no-warnings --print title \"" + youtubeUrl + "\"";
+    std::string title = executeCommand(cmd);
+    if (title.empty()) {
+        title = "Film z YouTube";
+    }
+    return title;
 }
 
 std::string YouTubeFetcher::getVideoStreamUrl(const std::string& youtubeUrl) {
@@ -37,12 +46,11 @@ std::string YouTubeFetcher::downloadVideo(const std::string& youtubeUrl) {
         std::filesystem::remove("temp_video" + ext, ec);
     }
 
-    // Try downloading with 720p limit (fast download, high enough resolution for terminal ASCII)
+    // Download with 720p limit (fast download, optimal resolution for terminal ASCII)
     std::string cmd = "yt-dlp --no-playlist --force-overwrites -f \"bestvideo[height<=720][ext=mp4]/bestvideo[ext=mp4]/best[ext=mp4]/bestvideo/best\" --remux-video mp4 -o \"temp_video.mp4\" \"" + youtubeUrl + "\"";
     int exitCode = std::system(cmd.c_str());
 
     if (exitCode != 0 || !std::filesystem::exists("temp_video.mp4")) {
-        // Fallback without strict format or remux
         cmd = "yt-dlp --no-playlist --force-overwrites -f \"bestvideo[height<=720]/bestvideo/best\" -o \"temp_video.%(ext)s\" \"" + youtubeUrl + "\"";
         exitCode = std::system(cmd.c_str());
     }

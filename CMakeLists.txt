@@ -17,7 +17,7 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(SFML)
 
 # Ścieżka do OpenCV w MSYS2 (żeby CMake na pewno ją znalazł)
-set(OpenCV_DIR "C:/msys64/mingw64/lib/cmake/opencv4")
+# set(OpenCV_DIR "C:/msys64/mingw64/lib/cmake/opencv4")
 find_package(OpenCV REQUIRED)
 
 file(GLOB_RECURSE SOURCES "src/*.cpp")
@@ -32,6 +32,3 @@ target_link_libraries(ASCIIconverter PRIVATE
         SFML::Audio
         SFML::System
 )
-
-# Flagi wymuszające statyczne wbudowanie bibliotek standardowych MinGW
-target_link_options(ASCIIconverter PRIVATE -static-libgcc -static-libstdc++)

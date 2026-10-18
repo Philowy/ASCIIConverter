@@ -1,6 +1,7 @@
 #pragma once
 #include <opencv2/opencv.hpp>
 #include <string>
+#include <vector>
 
 class AsciiRenderer {
 public:
@@ -11,6 +12,8 @@ public:
     [[nodiscard]] int getHeight() const { return m_height; }
 
     [[nodiscard]] std::string convertFrameToAscii(const cv::Mat& frame) const;
+    void convertBatchParallel(const std::vector<cv::Mat>& batch, std::vector<std::string>& outResults) const;
+
     void renderAscii(const std::string& asciiFrame) const;
     void renderFrame(const cv::Mat& frame);
 
